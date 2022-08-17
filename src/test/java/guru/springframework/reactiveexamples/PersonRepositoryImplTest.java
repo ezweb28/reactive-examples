@@ -3,7 +3,10 @@ package guru.springframework.reactiveexamples;
 import guru.springframework.reactiveexamples.domain.Person;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -44,4 +47,32 @@ class PersonRepositoryImplTest {
             System.out.println("from map: " + firstName);
         });
     }
+
+    @Test
+    void fluxTestBlockFirst() {
+        Flux<Person> personFlux = personRepository.findAll();
+
+        Person person = personFlux.blockFirst();
+
+        System.out.println(person);
+    }
+
+    @Test
+    void fluxTestSubscribe() {
+        Flux<Person> personFlux = personRepository.findAll();
+
+        personFlux.subscribe(System.out::println);
+    }
+
+    @Test
+    void fluxTestToListMono() {
+        Flux<Person> personFlux = personRepository.findAll();
+
+        Mono<List<Person>> personListMono = personFlux.collectList();
+
+        personListMono.subscribe(list -> {
+            list.forEach(System.out::println);
+        });
+    }
+
 }
