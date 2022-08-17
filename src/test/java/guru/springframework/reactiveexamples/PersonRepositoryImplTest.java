@@ -75,4 +75,42 @@ class PersonRepositoryImplTest {
         });
     }
 
+    @Test
+    void testFindPersonById() {
+        Flux<Person> personFlux = personRepository.findAll();
+
+        final Integer id = 3;
+
+        Mono<Person> personMono = personFlux.filter(person -> person.getId().equals(id)).next();
+
+        personMono.subscribe(System.out::println);
+
+    }
+
+    @Test
+    void testFindPersonByIdNotFound() {
+        Flux<Person> personFlux = personRepository.findAll();
+
+        final Integer id = 8;
+
+        Mono<Person> personMono = personFlux.filter(person -> person.getId().equals(id)).next();
+
+        personMono.subscribe(System.out::println);
+
+    }
+
+    @Test
+    void testFindPersonByIdNotFoundWithException() {
+        Flux<Person> personFlux = personRepository.findAll();
+
+        final Integer id = 8;
+
+        Mono<Person> personMono = personFlux.filter(person -> person.getId().equals(id)).single();
+
+        personMono.doOnError(throwable -> {
+            System.out.println("No element or more than 1 element found");
+        }).onErrorReturn(Person.builder().id(id).build())
+                .subscribe(System.out::println);
+    }
+
 }
